@@ -1,0 +1,33 @@
+
+1. Resize the Partition (Using gdisk):
+   - Delete the old partition (partition 3):
+     d
+   - Create a new partition (partition 3) with the extended size:
+     n
+     - Set the partition number to 3.
+     - Set the first sector to 3719168 (default).
+     - Set the last sector to use all available space (press Enter).
+     - Set the hex code to 8e00 (Linux LVM).
+   - Write changes to disk:
+     w
+
+2. Reboot the System:
+   - To apply the changes:
+     sudo reboot
+
+3. Resize the Physical Volume (Using pvresize):
+   - After the reboot, resize the physical volume to use the new space:
+     sudo pvresize /dev/sda3
+
+4. Extend the Logical Volume (Using lvextend):
+   - Extend the logical volume to use all free space:
+     sudo lvextend -l +100%FREE /dev/mapper/ubuntu--vg-ubuntu--lv
+
+5. Resize the Filesystem:
+   - Resize the filesystem to use the newly allocated space:
+     - For ext4 filesystem:
+       sudo resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
+
+6. Verify the Changes:
+   - Check the root filesystem size:
+     df -h /
